@@ -1,7 +1,7 @@
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import {User} from "../models/user.models.js"
-import {uploadOnCloudinary} from "../utils/cloudnary.js"
+import {uploadCloudnary} from "../utils/cloudnary.js"
 import { ApiResponse } from "../utils/apiResponse.js"
 
 const registerUser = asyncHandler(async(req, res) => {
@@ -26,20 +26,27 @@ const registerUser = asyncHandler(async(req, res) => {
         $or: [{ username },  { email }]
     })
 
+    console.log(`existedUser: ${existedUser}`)
+    
+    
     if(existedUser){
         throw new ApiError(409, "user with email or username already exist")
     }
-
+    
     const avatarLocalPath = req.files?.avatar[0]?.path
     const coverImageLocalPath = req.files?.coverImage[0]?.path
-
+    
+    console.log(`avatarLocalPath: ${avatarLocalPath} coverImageLocalPath: ${coverImageLocalPath}`)
+    
     if(!avatarLocalPath){
         throw new ApiError(400, "Avatar files required")
     }
-
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
-
+    
+    const avatar = await uploadCloudnary(avatarLocalPath);
+    const coverImage = await uploadCloudnary(coverImageLocalPath)
+    
+    console.log(`avatar: ${avatar} coverImage: ${coverImage}`)
+    
     if(!avatar){
         throw new ApiError(400, "Avatar files required")   
     }
@@ -53,8 +60,12 @@ const registerUser = asyncHandler(async(req, res) => {
         username: username.toLowerCase()
     })
 
+    console.log(`user : ${user}`)
+    
     const createdUser = await User.findById(user._id)
     .select("-password -refreshToken")
+    
+    console.log(`createdUser : ${createdUser}`)
 
     if(!createdUser){
         throw new ApiError(500, "Somethin went wrong wile registering the user")
