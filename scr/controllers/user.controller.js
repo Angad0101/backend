@@ -1,8 +1,8 @@
 import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiError} from "../utils/ApiError.js"
 import {User} from "../models/user.models.js"
-import {uploadCloudnary} from "../utils/cloudnary.js"
 import { ApiResponse } from "../utils/apiResponse.js"
+import {uploadCloudinary} from "../utils/cloudinary.js"
 
 
 const registerUser = asyncHandler(async(req, res) => {
@@ -17,7 +17,7 @@ const registerUser = asyncHandler(async(req, res) => {
     // return response
 
 
-    const { username, email, fullname, password} = req.body
+    const { username, email, fullname, password} = req.body;
 
     if(
         [username, email, fullname, password].some((field) =>
@@ -46,8 +46,8 @@ const registerUser = asyncHandler(async(req, res) => {
         throw new ApiError(400, "Avatar filespath required")
     }
     
-    const avatar = await uploadCloudnary(avatarLocalPath);
-    const coverImage = await uploadCloudnary(coverImageLocalPath)
+    const avatar = await uploadCloudinary(avatarLocalPath);
+    const coverImage = await uploadCloudinary(coverImageLocalPath)
     
     console.log(`avatar: ${avatar} coverImage: ${coverImage}`)
     
