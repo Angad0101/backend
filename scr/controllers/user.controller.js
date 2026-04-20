@@ -4,8 +4,9 @@ import {User} from "../models/user.models.js"
 import {uploadCloudnary} from "../utils/cloudnary.js"
 import { ApiResponse } from "../utils/apiResponse.js"
 
+
 const registerUser = asyncHandler(async(req, res) => {
-    // get user detail from fromtend
+    // get user detail from frontend
     // valiadate -not empty
     // check user already exist
     // check images for cloudnary
@@ -15,14 +16,17 @@ const registerUser = asyncHandler(async(req, res) => {
     // check for create user
     // return response
 
+
+    const { username, email, fullname, password} = req.body
+
     if(
-        [fullname, email, username, password].some((field) =>
+        [username, email, fullname, password].some((field) =>
         field?.trim() === "")
     ){
         throw new ApiError(400, "All field are required")
     }
 
-   const existedUser =  User.findOne({
+   const existedUser =  await User.findOne({
         $or: [{ username },  { email }]
     })
 
@@ -33,13 +37,13 @@ const registerUser = asyncHandler(async(req, res) => {
         throw new ApiError(409, "user with email or username already exist")
     }
     
-    const avatarLocalPath = req.files?.avatar[0]?.path
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
+    const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
     
     console.log(`avatarLocalPath: ${avatarLocalPath} coverImageLocalPath: ${coverImageLocalPath}`)
     
     if(!avatarLocalPath){
-        throw new ApiError(400, "Avatar files required")
+        throw new ApiError(400, "Avatar filespath required")
     }
     
     const avatar = await uploadCloudnary(avatarLocalPath);
@@ -49,6 +53,9 @@ const registerUser = asyncHandler(async(req, res) => {
     
     if(!avatar){
         throw new ApiError(400, "Avatar files required")   
+    }
+    if(!coverImage){
+        throw new ApiError(400, "coverImage files required")   
     }
 
     const user = await User.create({
